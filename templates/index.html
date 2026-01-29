@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Yuki Naito, Python port">
+    <title>difff《ﾃﾞｭﾌﾌ》</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='css/style.css') }}">
+</head>
+<body>
+    <div id="top">
+        <div class="header">
+            <span class="title">
+                <a class="title-link" href="/">　Diff by Python</a>
+            </span>
+        </div>
+        <hr>
+    </div>
+
+    <div id="form">
+        <p>　　下の枠に比較したい文章を入れてください。差分を表示します。</p>
+        
+        <form method="POST" id="difff" name="difff" action="/">
+            <table class="input-table">
+                <tr>
+                    <td class="input-cell">
+                        <textarea name="sequenceA" rows="20">{{ text_a }}</textarea>
+                    </td>
+                    <td class="input-cell">
+                        <textarea name="sequenceB" rows="20">{{ text_b }}</textarea>
+                    </td>
+                </tr>
+            </table>
+            
+            <p>
+                <input type="submit" value="比較する" class="compare-btn">
+            </p>
+        </form>
+    </div>
+
+    {% if show_result %}
+    <div id="result">
+        <table class="result-table">
+            {% for row in comparison_result %}
+            <tr>
+                <td>{{ row.text_a | safe }}</td>
+                <td>{{ row.text_b | safe }}</td>
+            </tr>
+            {% endfor %}
+            
+            <!-- Statistics row -->
+            <tr>
+                <td class="stats">
+                    <span class="stats-text">
+                        文字数: {{ stats_a.chars_only }}<br>
+                        空白数: {{ stats_a.with_spaces - stats_a.chars_only }} 空白込み文字数: {{ stats_a.with_spaces }}<br>
+                        改行数: {{ stats_a.with_newlines - stats_a.with_spaces }} 改行込み文字数: {{ stats_a.with_newlines }}<br>
+                        単語数: {{ stats_a.words }}
+                    </span>
+                </td>
+                <td class="stats">
+                    <span class="stats-text">
+                        文字数: {{ stats_b.chars_only }}<br>
+                        空白数: {{ stats_b.with_spaces - stats_b.chars_only }} 空白込み文字数: {{ stats_b.with_spaces }}<br>
+                        改行数: {{ stats_b.with_newlines - stats_b.with_spaces }} 改行込み文字数: {{ stats_b.with_newlines }}<br>
+                        単語数: {{ stats_b.words }}
+                    </span>
+                </td>
+            </tr>
+        </table>
+
+        <div class="controls">
+            <input type="button" id="hide" value="結果のみ表示 (印刷用)" onclick="hideForm()">
+            |
+            <input type="radio" name="color" value="1" onclick="setColor1()" checked>
+                <span class="blue">カラー1</span>
+            <input type="radio" name="color" value="2" onclick="setColor2()">
+                <span class="green">カラー2</span>
+            <input type="radio" name="color" value="3" onclick="setColor3()">
+                <span class="black">モノクロ</span>
+        </div>
+    </div>
+    {% endif %}
+
+    <script src="{{ url_for('static', path='js/script.js') }}"></script>
+</body>
+</html>
