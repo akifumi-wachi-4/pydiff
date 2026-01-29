@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from fastapi import FastAPI, Request, Form, HTTPException
+from fastapi import FastAPI, Request, Form
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -285,7 +285,7 @@ async def compare(
                 "stats_b": stats_b,
             },
         )
-    except Exception as e:
+    except Exception:
         # Handle any unexpected errors gracefully
         return templates.TemplateResponse(
             "index.html",
@@ -297,7 +297,7 @@ async def compare(
                 "comparison_result": None,
                 "stats_a": None,
                 "stats_b": None,
-                "error": f"処理中にエラーが発生しました。入力内容を確認してください。"
+                "error": "処理中にエラーが発生しました。入力内容を確認してください。"
             },
         )
 
