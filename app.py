@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from fastapi import FastAPI, Request, Form
+from fastapi import FastAPI, Request, Form, HTTPException
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 import difflib
 import re
+import secrets
+import hashlib
 
 app = FastAPI(title="diff-python", version="1.0")
 
@@ -65,11 +67,15 @@ def escape_html(text: str) -> str:
     if not text:
         return ""
 
+    # More comprehensive HTML escaping to prevent XSS
     text = text.replace("&", "&amp;")
     text = text.replace("<", "&lt;")
     text = text.replace(">", "&gt;")
     text = text.replace("'", "&#39;")
     text = text.replace('"', "&quot;")
+    text = text.replace("/", "&#x2F;")  # Forward slash
+    text = text.replace("`", "&#x60;")  # Backtick
+    text = text.replace("=", "&#x3D;")  # Equals sign
     return text
 
 
@@ -99,11 +105,12 @@ def count_characters(text: str) -> dict:
     text_no_spaces = re.sub(r"\s", "", text_no_newlines)
     char_count_only = len(text_no_spaces)
 
+    # Ensure all values are integers (security)
     return {
-        "chars_only": char_count_only,
-        "with_spaces": char_count_with_spaces,
-        "with_newlines": char_count_with_newlines,
-        "words": word_count,
+        "chars_only": int(char_count_only),
+        "with_spaces": int(char_count_with_spaces),
+        "with_newlines": int(char_count_with_newlines),
+        "words": int(word_count),
     }
 
 
@@ -218,6 +225,32 @@ async def compare(
     request: Request, sequenceA: str = Form(""), sequenceB: str = Form("")
 ):
     """Process text comparison"""
+    
+    # Input size limit for DoS prevention (100KB per field)
+    MAX_INPUT_SIZE = 100 * 1024
+    if len(sequenceA) > MAX_INPUT_SIZE or len(sequenceB) > MAX_INPUT_SIZE:
+        return templates.TemplateResponse(
+            "index.html",
+            {
+                "request": request,
+                "text_a": "",
+                "text_b": "",
+                "show_result": False,
+                "comparison_result": None,
+                "stats_a": None,
+                "stats_b": None,
+                "error": "入力テキストが大きすぎます。各フィールド100KB（約10万文字）以内にしてください。"
+            },
+        )
+    
+    # Validate input contains only safe characters (optional strict validation)
+    # This could be uncommented for extra security but may be too restrictive
+    # import string
+    # allowed_chars = set(string.printable + ''.join(chr(i) for i in range(0x3040, 0x30FF)))  # Japanese characters
+    # if sequenceA and not all(c in allowed_chars for c in sequenceA):
+    #     return templates.TemplateResponse("index.html", {..., "error": "無効な文字が含まれています"})
+    
+    # Rate limiting could be added here for production use
 
     # If both texts are empty, show default page
     if not sequenceA and not sequenceB:
@@ -234,25 +267,41 @@ async def compare(
             },
         )
 
-    # Compare texts
-    comparison_result = compare_texts(sequenceA, sequenceB)
+    try:
+        # Compare texts
+        comparison_result = compare_texts(sequenceA, sequenceB)
 
-    # Calculate character statistics
-    stats_a = count_characters(sequenceA)
-    stats_b = count_characters(sequenceB)
+        # Calculate character statistics
+        stats_a = count_characters(sequenceA)
+        stats_b = count_characters(sequenceB)
 
-    return templates.TemplateResponse(
-        "index.html",
-        {
-            "request": request,
-            "text_a": sequenceA,
-            "text_b": sequenceB,
-            "show_result": True,
-            "comparison_result": comparison_result,
-            "stats_a": stats_a,
-            "stats_b": stats_b,
-        },
-    )
+        return templates.TemplateResponse(
+            "index.html",
+            {
+                "request": request,
+                "text_a": sequenceA,
+                "text_b": sequenceB,
+                "show_result": True,
+                "comparison_result": comparison_result,
+                "stats_a": stats_a,
+                "stats_b": stats_b,
+            },
+        )
+    except Exception as e:
+        # Handle any unexpected errors gracefully
+        return templates.TemplateResponse(
+            "index.html",
+            {
+                "request": request,
+                "text_a": sequenceA,
+                "text_b": sequenceB,
+                "show_result": False,
+                "comparison_result": None,
+                "stats_a": None,
+                "stats_b": None,
+                "error": f"処理中にエラーが発生しました。入力内容を確認してください。"
+            },
+        )
 
 
 if __name__ == "__main__":

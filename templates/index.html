@@ -18,16 +18,22 @@
     </div>
 
     <div id="form">
-        <p>　　下の枠に比較したい文章を入れてください。差分を表示します。</p>
+        {% if error %}
+        <div class="error-message" style="color: red; padding: 10px; border: 1px solid red; margin-bottom: 10px; background-color: #ffe6e6;">
+            {{ error | e }}
+        </div>
+        {% endif %}
+        <p>　　下の枠に比較したい文章を入力し、「比較する」ボタンをクリックしてください。<br>
+        　　変更箱所がハイライトされた差分表が表示されます。</p>
         
         <form method="POST" id="difff" name="difff" action="/">
             <table class="input-table">
                 <tr>
                     <td class="input-cell">
-                        <textarea name="sequenceA" rows="20">{{ text_a }}</textarea>
+                        <textarea name="sequenceA" rows="20">{{ text_a | e }}</textarea>
                     </td>
                     <td class="input-cell">
-                        <textarea name="sequenceB" rows="20">{{ text_b }}</textarea>
+                        <textarea name="sequenceB" rows="20">{{ text_b | e }}</textarea>
                     </td>
                 </tr>
             </table>
@@ -52,18 +58,18 @@
             <tr>
                 <td class="stats">
                     <span class="stats-text">
-                        文字数: {{ stats_a.chars_only }}<br>
-                        空白数: {{ stats_a.with_spaces - stats_a.chars_only }} 空白込み文字数: {{ stats_a.with_spaces }}<br>
-                        改行数: {{ stats_a.with_newlines - stats_a.with_spaces }} 改行込み文字数: {{ stats_a.with_newlines }}<br>
-                        単語数: {{ stats_a.words }}
+                        文字数: {{ stats_a.chars_only | int }}<br>
+                        空白数: {{ (stats_a.with_spaces - stats_a.chars_only) | int }} 空白込み文字数: {{ stats_a.with_spaces | int }}<br>
+                        改行数: {{ (stats_a.with_newlines - stats_a.with_spaces) | int }} 改行込み文字数: {{ stats_a.with_newlines | int }}<br>
+                        単語数: {{ stats_a.words | int }}
                     </span>
                 </td>
                 <td class="stats">
                     <span class="stats-text">
-                        文字数: {{ stats_b.chars_only }}<br>
-                        空白数: {{ stats_b.with_spaces - stats_b.chars_only }} 空白込み文字数: {{ stats_b.with_spaces }}<br>
-                        改行数: {{ stats_b.with_newlines - stats_b.with_spaces }} 改行込み文字数: {{ stats_b.with_newlines }}<br>
-                        単語数: {{ stats_b.words }}
+                        文字数: {{ stats_b.chars_only | int }}<br>
+                        空白数: {{ (stats_b.with_spaces - stats_b.chars_only) | int }} 空白込み文字数: {{ stats_b.with_spaces | int }}<br>
+                        改行数: {{ (stats_b.with_newlines - stats_b.with_spaces) | int }} 改行込み文字数: {{ stats_b.with_newlines | int }}<br>
+                        単語数: {{ stats_b.words | int }}
                     </span>
                 </td>
             </tr>
