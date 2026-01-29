@@ -7,8 +7,6 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 import difflib
 import re
-import secrets
-import hashlib
 
 app = FastAPI(title="diff-python", version="1.0")
 

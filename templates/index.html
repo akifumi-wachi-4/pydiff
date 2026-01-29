@@ -4,89 +4,108 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="author" content="Yuki Naito, Python port">
-    <title>difff《ﾃﾞｭﾌﾌ》</title>
+    <!-- <meta name="description" content="モダンなテキスト差分比較ツール - 2つの文章を比較して違いを視覚的にハイライト表示"> -->
+    <title>Modern Diff Tool - テキスト差分比較</title>
     <link rel="stylesheet" href="{{ url_for('static', path='css/style.css') }}">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔍</text></svg>">
 </head>
 <body>
-    <div id="top">
-        <div class="header">
-            <span class="title">
-                <a class="title-link" href="/">　Diff by Python</a>
-            </span>
+    <div class="container">
+        <div id="top">
+            <div class="header">
+                <h1 class="title">
+                    <a class="title-link" href="/">📝 Python Diff Tool</a>
+                </h1>
+            </div>
         </div>
-        <hr>
-    </div>
 
-    <div id="form">
-        {% if error %}
-        <div class="error-message" style="color: red; padding: 10px; border: 1px solid red; margin-bottom: 10px; background-color: #ffe6e6;">
-            {{ error | e }}
+        <div id="form">
+            {% if error %}
+            <div class="error-message">
+                {{ error | e }}
+            </div>
+            {% endif %}
+            <p>
+                2つのテキストを比較して、ハイライト表示します。<br>
+                左右のテキストエリアに比較したい文章を入力し、「比較実行」ボタンをクリックしてください。
+            </p>
+            
+            <form method="POST" id="difff" name="difff" action="/">
+                <table class="input-table">
+                    <tr>
+                        <td class="input-cell">
+                            <textarea name="sequenceA" rows="20" placeholder="比較元のテキストを入力してください...">{{ text_a | e }}</textarea>
+                        </td>
+                        <td class="input-cell">
+                            <textarea name="sequenceB" rows="20" placeholder="比較先のテキストを入力してください...">{{ text_b | e }}</textarea>
+                        </td>
+                    </tr>
+                </table>
+                
+                <button type="submit" class="compare-btn">
+                    🔍 比較実行
+                </button>
+            </form>
         </div>
-        {% endif %}
-        <p>　　下の枠に比較したい文章を入力し、「比較する」ボタンをクリックしてください。<br>
-        　　変更箱所がハイライトされた差分表が表示されます。</p>
-        
-        <form method="POST" id="difff" name="difff" action="/">
-            <table class="input-table">
+
+        {% if show_result %}
+        <div id="result">
+            <h2 style="color: var(--gray-700); font-size: 20px; font-weight: 600; margin-bottom: 20px; text-align: center;">
+                📊 比較結果
+            </h2>
+            
+            <table class="result-table">
+                {% for row in comparison_result %}
                 <tr>
-                    <td class="input-cell">
-                        <textarea name="sequenceA" rows="20">{{ text_a | e }}</textarea>
+                    <td>{{ row.text_a | safe }}</td>
+                    <td>{{ row.text_b | safe }}</td>
+                </tr>
+                {% endfor %}
+                
+                <!-- Statistics row -->
+                <tr>
+                    <td class="stats">
+                        <div class="stats-text">
+                            <strong>📈 統計情報 (左側)</strong><br>
+                            文字数: {{ stats_a.chars_only | int }} 文字<br>
+                            空白数: {{ (stats_a.with_spaces - stats_a.chars_only) | int }} 個<br>
+                            改行数: {{ (stats_a.with_newlines - stats_a.with_spaces) | int }} 個<br>
+                            単語数: {{ stats_a.words | int }} 語
+                        </div>
                     </td>
-                    <td class="input-cell">
-                        <textarea name="sequenceB" rows="20">{{ text_b | e }}</textarea>
+                    <td class="stats">
+                        <div class="stats-text">
+                            <strong>📈 統計情報 (右側)</strong><br>
+                            文字数: {{ stats_b.chars_only | int }} 文字<br>
+                            空白数: {{ (stats_b.with_spaces - stats_b.chars_only) | int }} 個<br>
+                            改行数: {{ (stats_b.with_newlines - stats_b.with_spaces) | int }} 個<br>
+                            単語数: {{ stats_b.words | int }} 語
+                        </div>
                     </td>
                 </tr>
             </table>
-            
-            <p>
-                <input type="submit" value="比較する" class="compare-btn">
-            </p>
-        </form>
-    </div>
 
-    {% if show_result %}
-    <div id="result">
-        <table class="result-table">
-            {% for row in comparison_result %}
-            <tr>
-                <td>{{ row.text_a | safe }}</td>
-                <td>{{ row.text_b | safe }}</td>
-            </tr>
-            {% endfor %}
-            
-            <!-- Statistics row -->
-            <tr>
-                <td class="stats">
-                    <span class="stats-text">
-                        文字数: {{ stats_a.chars_only | int }}<br>
-                        空白数: {{ (stats_a.with_spaces - stats_a.chars_only) | int }} 空白込み文字数: {{ stats_a.with_spaces | int }}<br>
-                        改行数: {{ (stats_a.with_newlines - stats_a.with_spaces) | int }} 改行込み文字数: {{ stats_a.with_newlines | int }}<br>
-                        単語数: {{ stats_a.words | int }}
-                    </span>
-                </td>
-                <td class="stats">
-                    <span class="stats-text">
-                        文字数: {{ stats_b.chars_only | int }}<br>
-                        空白数: {{ (stats_b.with_spaces - stats_b.chars_only) | int }} 空白込み文字数: {{ stats_b.with_spaces | int }}<br>
-                        改行数: {{ (stats_b.with_newlines - stats_b.with_spaces) | int }} 改行込み文字数: {{ stats_b.with_newlines | int }}<br>
-                        単語数: {{ stats_b.words | int }}
-                    </span>
-                </td>
-            </tr>
-        </table>
-
-        <div class="controls">
-            <input type="button" id="hide" value="結果のみ表示 (印刷用)" onclick="hideForm()">
-            |
-            <input type="radio" name="color" value="1" onclick="setColor1()" checked>
-                <span class="blue">カラー1</span>
-            <input type="radio" name="color" value="2" onclick="setColor2()">
-                <span class="green">カラー2</span>
-            <input type="radio" name="color" value="3" onclick="setColor3()">
-                <span class="black">モノクロ</span>
+            <div class="controls">
+                <input type="button" id="hide" value="📄 印刷用表示切替" onclick="hideForm()">
+                <div style="margin-top: 15px;">
+                    <span style="color: var(--gray-600); font-weight: 600;">🎨 カラーテーマ:</span>
+                    <label style="margin: 0 10px; cursor: pointer;">
+                        <input type="radio" name="color" value="1" onclick="setColor1()" checked style="margin-right: 5px;">
+                        <span class="blue">ブルー</span>
+                    </label>
+                    <label style="margin: 0 10px; cursor: pointer;">
+                        <input type="radio" name="color" value="2" onclick="setColor2()" style="margin-right: 5px;">
+                        <span class="green">グリーン</span>
+                    </label>
+                    <label style="margin: 0 10px; cursor: pointer;">
+                        <input type="radio" name="color" value="3" onclick="setColor3()" style="margin-right: 5px;">
+                        <span class="black">モノクロ</span>
+                    </label>
+                </div>
+            </div>
         </div>
+        {% endif %}
     </div>
-    {% endif %}
 
     <script src="{{ url_for('static', path='js/script.js') }}"></script>
 </body>
