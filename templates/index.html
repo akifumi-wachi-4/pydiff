@@ -86,21 +86,22 @@
             </table>
 
             <div class="controls">
-                <input type="button" id="hide" value="📄 印刷用表示切替" onclick="hideForm()">
-                <div style="margin-top: 15px;">
-                    <span style="color: var(--gray-600); font-weight: 600;">🎨 カラーテーマ:</span>
-                    <label style="margin: 0 10px; cursor: pointer;">
-                        <input type="radio" name="color" value="1" onclick="setColor1()" checked style="margin-right: 5px;">
-                        <span class="blue">ブルー</span>
-                    </label>
-                    <label style="margin: 0 10px; cursor: pointer;">
-                        <input type="radio" name="color" value="2" onclick="setColor2()" style="margin-right: 5px;">
-                        <span class="green">グリーン</span>
-                    </label>
-                    <label style="margin: 0 10px; cursor: pointer;">
-                        <input type="radio" name="color" value="3" onclick="setColor3()" style="margin-right: 5px;">
-                        <span class="black">モノクロ</span>
-                    </label>
+                <div style="text-align: center;">
+                    <span style="color: var(--gray-600); font-weight: 600; font-size: 16px;">🎨 カラーテーマ</span>
+                    <div style="margin-top: 15px;">
+                        <label style="margin: 0 15px; cursor: pointer; display: inline-block;">
+                            <input type="radio" name="color" value="1" onclick="setColor1()" checked style="margin-right: 8px;">
+                            <span class="blue">ブルー</span>
+                        </label>
+                        <label style="margin: 0 15px; cursor: pointer; display: inline-block;">
+                            <input type="radio" name="color" value="2" onclick="setColor2()" style="margin-right: 8px;">
+                            <span class="green">グリーン</span>
+                        </label>
+                        <label style="margin: 0 15px; cursor: pointer; display: inline-block;">
+                            <input type="radio" name="color" value="3" onclick="setColor3()" style="margin-right: 8px;">
+                            <span class="black">モノクロ</span>
+                        </label>
+                    </div>
                 </div>
             </div>
         </div>
