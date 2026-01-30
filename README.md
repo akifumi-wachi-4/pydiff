@@ -15,7 +15,7 @@ This repository is based on [meso-cacase/difff](https://github.com/meso-cacase/d
 1. **Clone the repository**
    ```bash
    git clone <repository-url>
-   cd difff-python
+   cd pydiff
    ```
 
 2. **Install dependencies using UV (recommended)**
