@@ -2,7 +2,7 @@
 
 A modern, web-based text difference comparison tool built with Python and FastAPI. This tool allows you to compare two texts side by side and visualize their differences with syntax highlighting.
 
-This repository is based on [meso-cacase/difff](https://github.com/meso-cacase/difff), which is a Perl-based text difference tool. This Python implementation provides the same functionality with a modern web framework.
+This repository is based on [meso-cacase/difff](https://github.com/meso-cacase/difff), a Perl-based text difference tool. This Python implementation provides the same functionality with a modern web framework.
 
 ## Installation & Setup 🚀
 
@@ -49,7 +49,9 @@ This repository is based on [meso-cacase/difff](https://github.com/meso-cacase/d
 
 ## License 📄
 
-[Include your license information here]
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+This application is based on [difff](https://github.com/meso-cacase/difff), which is licensed under the 2-Clause BSD License.
 
 ## Support 💬
 
