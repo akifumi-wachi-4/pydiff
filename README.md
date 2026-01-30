@@ -14,7 +14,7 @@ This repository is based on [meso-cacase/difff](https://github.com/meso-cacase/d
 
 1. **Clone the repository**
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/akifumi-wachi-4/pydiff
    cd pydiff
    ```
 
