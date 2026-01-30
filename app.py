@@ -297,12 +297,6 @@ async def compare(
                 "comparison_result": None,
                 "stats_a": None,
                 "stats_b": None,
-                "error": "処理中にエラーが発生しました。入力内容を確認してください。"
+                "error": ""
             },
         )
-
-
-if __name__ == "__main__":
-    import uvicorn
-
-    uvicorn.run(app, host="0.0.0.0", port=8000, reload=True)
